@@ -59,6 +59,7 @@ public class HttpRequest {
             this.header = new HashMap<>();
         }
         this.header.put(key, value);
+
     }
 
     public String getHeaderValueByKey(String key) {
