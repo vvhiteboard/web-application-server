@@ -1,16 +1,22 @@
 package util;
 
+import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import model.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webserver.RequestHandler;
 
 public class HttpRequestUtils {
+    private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+
     /**
-     * @param queryString은
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
     public static Map<String, String> parseQueryString(String queryString) {
@@ -18,8 +24,7 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param 쿠키
-     *            값은 name1=value1; name2=value2 형식임
+     * @param 쿠키 값은 name1=value1; name2=value2 형식임
      * @return
      */
     public static Map<String, String> parseCookies(String cookies) {
@@ -32,6 +37,7 @@ public class HttpRequestUtils {
         }
 
         String[] tokens = values.split(separator);
+        // Lambda 표현식
         return Arrays.stream(tokens).map(t -> getKeyValue(t, "=")).filter(p -> p != null)
                 .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
     }
@@ -47,6 +53,37 @@ public class HttpRequestUtils {
         }
 
         return new Pair(tokens[0], tokens[1]);
+    }
+
+    public static HttpRequest parseHttpRequest(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        HttpRequest httpRequest = new HttpRequest();
+
+        parseHeader(br, httpRequest);
+
+        return httpRequest;
+    }
+
+    public static HttpRequest parseHeader(BufferedReader br, HttpRequest httpRequest) throws IOException {
+        // parse http header first line ( request line )
+        String[] requestLineValues = br.readLine().split(" ");
+        httpRequest.setMethod(requestLineValues[0]);
+        httpRequest.setPath(requestLineValues[1]);
+        httpRequest.setVersion(requestLineValues[2]);
+
+        String requestHeader = br.readLine();
+        while (requestHeader != null && !requestHeader.isEmpty()) {
+            Pair keyValue = getKeyValue(requestHeader, ": ");
+            if (keyValue == null) {
+                log.debug("invalid Http Header : {}\r\n", requestHeader);
+                requestHeader = br.readLine();
+                continue;
+            }
+            httpRequest.setHeaderKeyValue(keyValue.getKey(), keyValue.getValue());
+            requestHeader = br.readLine();
+        }
+
+        return httpRequest;
     }
 
     public static Pair parseHeader(String header) {
