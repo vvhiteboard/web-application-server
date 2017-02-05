@@ -9,7 +9,7 @@ import java.util.Map;
 public class HttpRequest {
     private Map<String, String> requestLine;
     private Map<String, String> header;
-    private Map<String, String> body;
+    private String body;
 
     private Map<String, String> queryString;
 
@@ -45,14 +45,6 @@ public class HttpRequest {
         this.header = header;
     }
 
-    public Map<String, String> getBody() {
-        return body;
-    }
-
-    public void setBody(Map<String, String> body) {
-        this.body = body;
-    }
-
     public void setHeaderKeyValue(String key, String value) {
         if (this.header == null) {
             this.header = new HashMap<>();
@@ -68,18 +60,12 @@ public class HttpRequest {
         return this.header.get(key);
     }
 
-    public void setBodyKeyAndValue(String key, String value) {
-        if (this.body == null) {
-            this.body = new HashMap<>();
-        }
-        this.body.put(key, value);
+    public String getBody() {
+        return body;
     }
 
-    public String getBodyValueByKey(String key) {
-        if (this.body == null) {
-            return null;
-        }
-        return this.body.get(key);
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public Map<String, String> getRequestLine() {

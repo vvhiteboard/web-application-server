@@ -68,7 +68,7 @@ public class HttpRequestUtils {
         httpRequest.setHeader(parseRequestHeader(requestStream));
 
         if ("POST".equals(httpRequest.getMethod())) {
-            // TODO : POST가 지원되면 parseRequestBody도 작성해야함
+            httpRequest.setBody(parseRequestBody(requestStream, httpRequest.getHeaderValueByKey("Content-Length")));
         }
 
         return httpRequest;
@@ -104,6 +104,14 @@ public class HttpRequestUtils {
             requestHeaderLine = requestStream.readLine();
         }
         return requestHeader;
+    }
+
+    public static String parseRequestBody(BufferedReader requestStream, String contentLength) throws IOException {
+        int bodySize = Integer.parseInt(contentLength);
+        char[] bodyStream = new char[bodySize];
+        requestStream.read(bodyStream, 0, bodySize);
+
+        return new String(bodyStream);
     }
 
     public static class Pair {
