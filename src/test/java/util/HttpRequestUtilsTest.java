@@ -63,11 +63,4 @@ public class HttpRequestUtilsTest {
         Pair pair = HttpRequestUtils.getKeyValue("userId", "=");
         assertThat(pair, is(nullValue()));
     }
-
-    @Test
-    public void parseHeader() throws Exception {
-        String header = "Content-Length: 59";
-        Pair pair = HttpRequestUtils.parseRequestHeader(header);
-        assertThat(pair, is(new Pair("Content-Length", "59")));
-    }
 }

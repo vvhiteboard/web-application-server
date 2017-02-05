@@ -11,6 +11,8 @@ public class HttpRequest {
     private Map<String, String> header;
     private Map<String, String> body;
 
+    private Map<String, String> queryString;
+
     public String getMethod() {
         return requestLine.get("method");
     }
@@ -86,5 +88,13 @@ public class HttpRequest {
 
     public void setRequestLine(Map<String, String> requestLine) {
         this.requestLine = requestLine;
+    }
+
+    public Map<String, String> getQueryString() {
+        return queryString;
+    }
+
+    public void setQueryString(Map<String, String> queryString) {
+        this.queryString = queryString;
     }
 }

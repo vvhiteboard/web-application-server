@@ -17,7 +17,7 @@ public class HttpRequestUtils {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
     /**
-     * @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString : URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
     public static Map<String, String> parseQueryString(String queryString) {
@@ -25,7 +25,7 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param 쿠키 값은 name1=value1; name2=value2 형식임
+     * @param cookies : 쿠키 값은 name1=value1; name2=value2 형식임
      * @return
      */
     public static Map<String, String> parseCookies(String cookies) {
@@ -61,8 +61,15 @@ public class HttpRequestUtils {
         HttpRequest httpRequest = new HttpRequest();
 
         httpRequest.setRequestLine(parseRequestLine(requestStream));
+        if (httpRequest.getRequestLine().containsKey("queryString")) {
+            httpRequest.setQueryString(parseQueryString(httpRequest.getRequestLine().get("queryString")));
+        }
+
         httpRequest.setHeader(parseRequestHeader(requestStream));
-        // TODO : POST가 지원되면 parseRequestBody도 작성해야함
+
+        if ("POST".equals(httpRequest.getMethod())) {
+            // TODO : POST가 지원되면 parseRequestBody도 작성해야함
+        }
 
         return httpRequest;
     }
@@ -72,8 +79,12 @@ public class HttpRequestUtils {
         String[] requestLineValues = requestStream.readLine().split(" ");
 
         requestLine.put("method", requestLineValues[0]);
-        requestLine.put("path", requestLineValues[1]);
         requestLine.put("version", requestLineValues[2]);
+        String[] requestURLs = requestLineValues[1].split("\\?");
+        requestLine.put("path", requestURLs[0]);
+        if (requestURLs.length > 1) {
+            requestLine.put("queryString", requestURLs[1]);
+        }
         return requestLine;
     }
 
@@ -93,10 +104,6 @@ public class HttpRequestUtils {
             requestHeaderLine = requestStream.readLine();
         }
         return requestHeader;
-    }
-
-    public static Pair parseRequestHeader(String header) {
-        return getKeyValue(header, ": ");
     }
 
     public static class Pair {
