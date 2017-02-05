@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.util.Map;
 
 import model.HttpRequest;
@@ -32,7 +33,7 @@ public class RequestHandler extends Thread {
             headers.keySet().forEach(key -> log.debug("key : {}, value : {}", key, headers.get(key)));
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+            byte[] body = Files.readAllBytes(new File("./webapp" + httpRequest.getPath()).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
