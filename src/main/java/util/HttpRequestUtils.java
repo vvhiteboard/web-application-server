@@ -2,6 +2,7 @@ package util;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -56,37 +57,45 @@ public class HttpRequestUtils {
     }
 
     public static HttpRequest parseHttpRequest(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        BufferedReader requestStream = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         HttpRequest httpRequest = new HttpRequest();
 
-        parseHeader(br, httpRequest);
+        httpRequest.setRequestLine(parseRequestLine(requestStream));
+        httpRequest.setHeader(parseRequestHeader(requestStream));
+        // TODO : POST가 지원되면 parseRequestBody도 작성해야함
 
         return httpRequest;
     }
 
-    public static HttpRequest parseHeader(BufferedReader br, HttpRequest httpRequest) throws IOException {
-        // parse http header first line ( request line )
-        String[] requestLineValues = br.readLine().split(" ");
-        httpRequest.setMethod(requestLineValues[0]);
-        httpRequest.setPath(requestLineValues[1]);
-        httpRequest.setVersion(requestLineValues[2]);
+    public static Map<String, String> parseRequestLine(BufferedReader requestStream) throws IOException {
+        Map<String, String> requestLine = new HashMap<>();
+        String[] requestLineValues = requestStream.readLine().split(" ");
 
-        String requestHeader = br.readLine();
-        while (requestHeader != null && !requestHeader.isEmpty()) {
-            Pair keyValue = getKeyValue(requestHeader, ": ");
+        requestLine.put("method", requestLineValues[0]);
+        requestLine.put("path", requestLineValues[1]);
+        requestLine.put("version", requestLineValues[2]);
+        return requestLine;
+    }
+
+    public static Map<String, String> parseRequestHeader(BufferedReader requestStream) throws IOException {
+        // parse http requestHeader first line ( request line )
+        Map<String, String> requestHeader = new HashMap<>();
+
+        String requestHeaderLine = requestStream.readLine();
+        while (requestHeaderLine != null && !requestHeaderLine.isEmpty()) {
+            Pair keyValue = getKeyValue(requestHeaderLine, ": ");
             if (keyValue == null) {
-                log.debug("invalid Http Header : {}\r\n", requestHeader);
-                requestHeader = br.readLine();
+                log.debug("invalid Http Header : {}\r\n", requestHeaderLine);
+                requestHeaderLine = requestStream.readLine();
                 continue;
             }
-            httpRequest.setHeaderKeyValue(keyValue.getKey(), keyValue.getValue());
-            requestHeader = br.readLine();
+            requestHeader.put(keyValue.getKey(), keyValue.getValue());
+            requestHeaderLine = requestStream.readLine();
         }
-
-        return httpRequest;
+        return requestHeader;
     }
 
-    public static Pair parseHeader(String header) {
+    public static Pair parseRequestHeader(String header) {
         return getKeyValue(header, ": ");
     }
 

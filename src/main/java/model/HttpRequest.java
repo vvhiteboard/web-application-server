@@ -7,35 +7,32 @@ import java.util.Map;
  * Created by loopin on 2017-01-30.
  */
 public class HttpRequest {
-    private String method;
-    private String version;
-    private String path;
-
+    private Map<String, String> requestLine;
     private Map<String, String> header;
     private Map<String, String> body;
 
     public String getMethod() {
-        return method;
+        return requestLine.get("method");
     }
 
     public void setMethod(String method) {
-        this.method = method;
+        this.requestLine.put("method", method);
     }
 
     public String getVersion() {
-        return version;
+        return this.requestLine.get("version");
     }
 
     public void setVersion(String version) {
-        this.version = version;
+        this.requestLine.put("version", version);
     }
 
     public String getPath() {
-        return path;
+        return this.requestLine.get("path");
     }
 
     public void setPath(String path) {
-        this.path = path;
+        this.requestLine.put("path", path);
     }
 
     public Map<String, String> getHeader() {
@@ -69,7 +66,7 @@ public class HttpRequest {
         return this.header.get(key);
     }
 
-    public void setBodyKeyValue(String key, String value) {
+    public void setBodyKeyAndValue(String key, String value) {
         if (this.body == null) {
             this.body = new HashMap<>();
         }
@@ -81,5 +78,13 @@ public class HttpRequest {
             return null;
         }
         return this.body.get(key);
+    }
+
+    public Map<String, String> getRequestLine() {
+        return requestLine;
+    }
+
+    public void setRequestLine(Map<String, String> requestLine) {
+        this.requestLine = requestLine;
     }
 }
