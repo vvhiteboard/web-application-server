@@ -56,19 +56,18 @@ public class HttpRequestUtils {
         return new Pair(tokens[0], tokens[1]);
     }
 
-    public static HttpRequest parseHttpRequest(InputStream in) throws IOException {
-        BufferedReader requestStream = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+    public static HttpRequest parseHttpRequest(BufferedReader requestReader) throws IOException {
         HttpRequest httpRequest = new HttpRequest();
 
-        httpRequest.setRequestLine(parseRequestLine(requestStream));
+        httpRequest.setRequestLine(parseRequestLine(requestReader));
         if (httpRequest.getRequestLine().containsKey("queryString")) {
             httpRequest.setQueryString(parseQueryString(httpRequest.getRequestLine().get("queryString")));
         }
 
-        httpRequest.setHeader(parseRequestHeader(requestStream));
+        httpRequest.setHeader(parseRequestHeader(requestReader));
 
         if ("POST".equals(httpRequest.getMethod())) {
-            httpRequest.setBody(parseRequestBody(requestStream, httpRequest.getHeaderValueByKey("Content-Length")));
+            httpRequest.setBody(parseRequestBody(requestReader, httpRequest.getHeaderValueByKey("Content-Length")));
         }
 
         return httpRequest;
