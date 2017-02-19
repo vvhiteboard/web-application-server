@@ -1,16 +1,23 @@
 package util;
 
+import java.io.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import model.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webserver.RequestHandler;
 
 public class HttpRequestUtils {
+    private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+
     /**
-     * @param queryString은
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString : URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
     public static Map<String, String> parseQueryString(String queryString) {
@@ -18,8 +25,7 @@ public class HttpRequestUtils {
     }
 
     /**
-     * @param 쿠키
-     *            값은 name1=value1; name2=value2 형식임
+     * @param cookies : 쿠키 값은 name1=value1; name2=value2 형식임
      * @return
      */
     public static Map<String, String> parseCookies(String cookies) {
@@ -32,6 +38,7 @@ public class HttpRequestUtils {
         }
 
         String[] tokens = values.split(separator);
+        // Lambda 표현식
         return Arrays.stream(tokens).map(t -> getKeyValue(t, "=")).filter(p -> p != null)
                 .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
     }
@@ -49,8 +56,63 @@ public class HttpRequestUtils {
         return new Pair(tokens[0], tokens[1]);
     }
 
-    public static Pair parseHeader(String header) {
-        return getKeyValue(header, ": ");
+    public static HttpRequest parseHttpRequest(BufferedReader requestReader) throws IOException {
+        HttpRequest httpRequest = new HttpRequest();
+
+        httpRequest.setRequestLine(parseRequestLine(requestReader));
+        if (httpRequest.getRequestLine().containsKey("queryString")) {
+            httpRequest.setQueryString(parseQueryString(httpRequest.getRequestLine().get("queryString")));
+        }
+
+        httpRequest.setHeader(parseRequestHeader(requestReader));
+        httpRequest.setCookies(parseCookies(httpRequest.getHeaderValueByKey("Cookie")));
+
+        if ("POST".equals(httpRequest.getMethod())) {
+            httpRequest.setBody(parseRequestBody(requestReader, httpRequest.getHeaderValueByKey("Content-Length")));
+        }
+
+        return httpRequest;
+    }
+
+    public static Map<String, String> parseRequestLine(BufferedReader requestStream) throws IOException {
+        Map<String, String> requestLine = new HashMap<>();
+        String[] requestLineValues = requestStream.readLine().split(" ");
+
+        requestLine.put("method", requestLineValues[0]);
+        requestLine.put("version", requestLineValues[2]);
+        String[] requestURLs = requestLineValues[1].split("\\?");
+        requestLine.put("path", requestURLs[0]);
+        if (requestURLs.length > 1) {
+            requestLine.put("queryString", requestURLs[1]);
+        }
+        return requestLine;
+    }
+
+    public static Map<String, String> parseRequestHeader(BufferedReader requestStream) throws IOException {
+        // parse http requestHeader first line ( request line )
+        Map<String, String> requestHeader = new HashMap<>();
+
+        String requestHeaderLine = requestStream.readLine();
+        while (requestHeaderLine != null && !requestHeaderLine.isEmpty()) {
+            Pair keyValue = getKeyValue(requestHeaderLine, ": ");
+            if (keyValue == null) {
+                log.debug("invalid Http Header : {}\r\n", requestHeaderLine);
+                requestHeaderLine = requestStream.readLine();
+                continue;
+            }
+            requestHeader.put(keyValue.getKey(), keyValue.getValue());
+            requestHeaderLine = requestStream.readLine();
+        }
+
+        return requestHeader;
+    }
+
+    public static String parseRequestBody(BufferedReader requestStream, String contentLength) throws IOException {
+        int bodySize = Integer.parseInt(contentLength);
+        char[] bodyStream = new char[bodySize];
+        requestStream.read(bodyStream, 0, bodySize);
+
+        return new String(bodyStream);
     }
 
     public static class Pair {

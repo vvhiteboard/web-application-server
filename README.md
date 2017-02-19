@@ -15,13 +15,19 @@
 * 각 요구사항을 구현하는 것이 중요한 것이 아니라 구현 과정을 통해 학습한 내용을 인식하는 것이 배움에 중요하다. 
 
 ### 요구사항 1 - http://localhost:8080/index.html로 접속시 응답
-* 
+* InputStream -> InputStreamReader -> BufferedReader로 변환한다.
+* BufferedReader에서 request를 읽으며 httpRequest 객체로 파싱한다.
+* 파싱한 httpRequest에서 path에 해당하는 파일을 읽어서 response에 전달한다. ( ex : index.html )
 
 ### 요구사항 2 - get 방식으로 회원가입
-* 
+* url로 전달되는 queryString을 path와 분리한다 (split)
+* 분리된 queryString을 파싱한다
+* 파싱된 데이터에서 User 객체를 생성한다.
 
 ### 요구사항 3 - post 방식으로 회원가입
-* 
+* request body로 전달된 데이터를 헤더의 "Content-Length" 값 만큼 읽는다.
+* 읽은 body를 정해진 규칙에 따라 파싱한다.
+* 파싱된 body에 해당하는 User 객체를 생성한다.
 
 ### 요구사항 4 - redirect 방식으로 이동
 * 
