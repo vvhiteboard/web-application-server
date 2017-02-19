@@ -30,13 +30,16 @@
 * 파싱된 body에 해당하는 User 객체를 생성한다.
 
 ### 요구사항 4 - redirect 방식으로 이동
-* 
+* 302 응답 코드 추가 ( response302Header 메서드 )
+* Location 옵션을 index.html로 설정
 
 ### 요구사항 5 - cookie
-* 
+* 전체적인 리팩토링 ( 응답하는 부분을 Utils로 추출함 )
+* 쿠키 설정하는 응답코드 추가
+* HttpResponse 객체와 HttpStatusCode enum형 추가
 
 ### 요구사항 6 - stylesheet 적용
-* 
+* 응답 시 요청한 파일 확장자에 따라 content type을 설정함
 
 ### heroku 서버에 배포 후
 * 
