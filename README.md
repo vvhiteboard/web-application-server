@@ -38,7 +38,11 @@
 * 쿠키 설정하는 응답코드 추가
 * HttpResponse 객체와 HttpStatusCode enum형 추가
 
-### 요구사항 6 - stylesheet 적용
+### 요구사항 6 - 사용자 목록 출력
+* DataBase 객체에서 사용자 정보를 가져온다.
+* response body로 전송
+
+### 요구사항 7 - stylesheet 적용
 * 응답 시 요청한 파일 확장자에 따라 content type을 설정함
 
 ### heroku 서버에 배포 후
