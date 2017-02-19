@@ -65,6 +65,7 @@ public class HttpRequestUtils {
         }
 
         httpRequest.setHeader(parseRequestHeader(requestReader));
+        httpRequest.setCookies(parseCookies(httpRequest.getHeaderValueByKey("Cookie")));
 
         if ("POST".equals(httpRequest.getMethod())) {
             httpRequest.setBody(parseRequestBody(requestReader, httpRequest.getHeaderValueByKey("Content-Length")));
@@ -102,6 +103,7 @@ public class HttpRequestUtils {
             requestHeader.put(keyValue.getKey(), keyValue.getValue());
             requestHeaderLine = requestStream.readLine();
         }
+
         return requestHeader;
     }
 

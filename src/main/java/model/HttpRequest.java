@@ -12,6 +12,7 @@ public class HttpRequest {
     private String body;
 
     private Map<String, String> queryString;
+    private Map<String, String> cookies;
 
     public String getMethod() {
         return requestLine.get("method");
@@ -82,5 +83,17 @@ public class HttpRequest {
 
     public void setQueryString(Map<String, String> queryString) {
         this.queryString = queryString;
+    }
+
+    public Map<String, String> getCookies() {
+        return cookies;
+    }
+
+    public String getCookie(String key) {
+        return cookies.get(key);
+    }
+
+    public void setCookies(Map<String, String> cookies) {
+        this.cookies = cookies;
     }
 }
