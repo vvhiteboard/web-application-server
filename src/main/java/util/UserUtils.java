@@ -12,4 +12,8 @@ public class UserUtils {
         User user = new User(param.get("userId"), param.get("password"), param.get("name"), param.get("email"));
         return user;
     }
+
+    public static boolean isLogined(String logined) {
+        return "true".equals(logined);
+    }
 }

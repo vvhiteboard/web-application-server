@@ -14,6 +14,7 @@ import util.UserUtils;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.Map;
 
 public class RequestHandler extends Thread {
@@ -78,10 +79,28 @@ public class RequestHandler extends Thread {
                 HttpResponseUtils.setResponseStream(responseStream, response);
             }
             else if ("/user/list".equals(httpRequest.getPath())) {
-                if ( "true".equals(httpRequest.getCookie("logined"))) {
-                    // 요구사항 6
+                if ( !UserUtils.isLogined(httpRequest.getCookie("logined"))) {
+                    HttpResponse response = HttpResponseUtils.createHttpResponse(HttpStatusCode.FOUND);
+                    response.setHeader("Location", "/user/login.html");
+                    HttpResponseUtils.setResponseStream(responseStream, response);
+                    return;
                 }
 
+                Collection<User> users = DataBase.findAll();
+                StringBuilder responseBuilder = new StringBuilder("");
+                responseBuilder.append("<table border='1'>");
+                for ( User user : users) {
+                    responseBuilder.append("<tr>");
+                    responseBuilder.append("<td>").append(user.getUserId()).append("</td>");
+                    responseBuilder.append("<td>").append(user.getName()).append("</td>");
+                    responseBuilder.append("<td>").append(user.getEmail()).append("</td>");
+                    responseBuilder.append("</tr>");
+                }
+                responseBuilder.append("</table>");
+                byte[] body = responseBuilder.toString().getBytes();
+                HttpResponse response = HttpResponseUtils.createHttpResponse(HttpStatusCode.OK);
+                HttpResponseUtils.setResponseBody(response, body);
+                HttpResponseUtils.setResponseStream(responseStream, response);
             }
             else {
                 log.debug("body : {}", httpRequest.getBody());
