@@ -77,9 +77,8 @@ public class RequestHandler extends Thread {
                     response.setHeader("Location", "/user/login_failed.html");
                 }
                 HttpResponseUtils.setResponseStream(responseStream, response);
-            }
-            else if ("/user/list".equals(httpRequest.getPath())) {
-                if ( !UserUtils.isLogined(httpRequest.getCookie("logined"))) {
+            } else if ("/user/list".equals(httpRequest.getPath())) {
+                if (!UserUtils.isLogined(httpRequest.getCookie("logined"))) {
                     HttpResponse response = HttpResponseUtils.createHttpResponse(HttpStatusCode.FOUND);
                     response.setHeader("Location", "/user/login.html");
                     HttpResponseUtils.setResponseStream(responseStream, response);
@@ -89,7 +88,7 @@ public class RequestHandler extends Thread {
                 Collection<User> users = DataBase.findAll();
                 StringBuilder responseBuilder = new StringBuilder("");
                 responseBuilder.append("<table border='1'>");
-                for ( User user : users) {
+                for (User user : users) {
                     responseBuilder.append("<tr>");
                     responseBuilder.append("<td>").append(user.getUserId()).append("</td>");
                     responseBuilder.append("<td>").append(user.getName()).append("</td>");
@@ -101,12 +100,20 @@ public class RequestHandler extends Thread {
                 HttpResponse response = HttpResponseUtils.createHttpResponse(HttpStatusCode.OK);
                 HttpResponseUtils.setResponseBody(response, body);
                 HttpResponseUtils.setResponseStream(responseStream, response);
-            }
-            else {
+            } else {
                 log.debug("body : {}", httpRequest.getBody());
-                byte[] body = Files.readAllBytes(new File("./webapp" + httpRequest.getPath()).toPath());
+                String path = httpRequest.getPath();
+                String contentType;
+                if (path.endsWith(".css")) {
+                    contentType = "text/css; charset=utf-8";
+                } else {
+                    contentType = "text/html; charset=utf-8";
+                }
+
+                byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
 
                 HttpResponse response = HttpResponseUtils.createHttpResponse(HttpStatusCode.OK);
+                response.setHeader("Content-Type", contentType);
                 HttpResponseUtils.setResponseBody(response, body);
                 HttpResponseUtils.setResponseStream(responseStream, response);
             }
