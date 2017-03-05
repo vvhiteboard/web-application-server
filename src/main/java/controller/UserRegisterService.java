@@ -4,7 +4,6 @@ import db.DataBase;
 import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
-import util.HttpRequestUtils;
 import util.HttpResponseUtils;
 import util.UserUtils;
 
@@ -22,8 +21,8 @@ public class UserRegisterService extends AbstractController {
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
-        Map<String, String> parameters = HttpRequestUtils.parseQueryString(request.getBodyContents());
-        register(parameters);
+        Map<String, String> userParametars = UserUtils.parseLoginParams(request.getBody());
+        register(userParametars);
         HttpResponseUtils.setRedirect(response, "/index.html");
     }
 

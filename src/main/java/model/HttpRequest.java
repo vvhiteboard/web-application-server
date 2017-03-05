@@ -13,9 +13,13 @@ import java.util.Map;
  * Created by loopin on 2017-01-30.
  */
 public class HttpRequest {
-    private Map<String, String> requestLine;
+    private String method;
+    private String version;
+    private String path;
+    private String queryString;
+
     private Map<String, String> header;
-    private String bodyContents;
+    private String body;
 
     private Map<String, String> parameters;
     private Map<String, String> cookies;
@@ -26,27 +30,35 @@ public class HttpRequest {
     }
 
     public String getMethod() {
-        return requestLine.get("method");
+        return method;
     }
 
     public void setMethod(String method) {
-        this.requestLine.put("method", method);
+        this.method = method;
     }
 
     public String getVersion() {
-        return this.requestLine.get("version");
+        return version;
     }
 
     public void setVersion(String version) {
-        this.requestLine.put("version", version);
+        this.version = version;
     }
 
     public String getPath() {
-        return this.requestLine.get("path");
+        return path;
     }
 
     public void setPath(String path) {
-        this.requestLine.put("path", path);
+        this.path = path;
+    }
+
+    public String getQueryString() {
+        return queryString;
+    }
+
+    public void setQueryString(String queryString) {
+        this.queryString = queryString;
     }
 
     public Map<String, String> getHeader() {
@@ -72,20 +84,12 @@ public class HttpRequest {
         return this.header.get(key);
     }
 
-    public String getBodyContents() {
-        return bodyContents;
+    public String getBody() {
+        return body;
     }
 
-    public void setBodyContents(String bodyContents) {
-        this.bodyContents = bodyContents;
-    }
-
-    public Map<String, String> getRequestLine() {
-        return requestLine;
-    }
-
-    public void setRequestLine(Map<String, String> requestLine) {
-        this.requestLine = requestLine;
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public Map<String, String> getParameters() {

@@ -5,7 +5,6 @@ import model.HttpRequest;
 import model.HttpResponse;
 import model.User;
 import org.apache.commons.lang.StringUtils;
-import util.HttpRequestUtils;
 import util.HttpResponseUtils;
 import util.UserUtils;
 
@@ -23,8 +22,8 @@ public class UserLoginService extends AbstractController {
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
-        Map<String, String> bodyParam = HttpRequestUtils.parseQueryString(request.getBodyContents());
-        User user = UserUtils.createUser(bodyParam);
+        Map<String, String> userParameters = UserUtils.parseLoginParams(request.getBody());
+        User user = UserUtils.createUser(userParameters);
 
         if(isValidUser(user)) {
             response.setCookie("logined", "true");
