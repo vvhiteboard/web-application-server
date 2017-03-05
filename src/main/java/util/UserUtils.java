@@ -1,6 +1,8 @@
 package util;
 
+import model.HttpRequest;
 import model.User;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 
@@ -13,7 +15,7 @@ public class UserUtils {
         return user;
     }
 
-    public static boolean isLogined(String logined) {
-        return "true".equals(logined);
+    public static boolean isLogout(Map<String, String> cookies) {
+        return (cookies.get("logined") == null) || (StringUtils.equals(cookies.get("logined"), "false"));
     }
 }

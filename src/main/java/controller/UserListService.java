@@ -5,10 +5,12 @@ import model.HttpRequest;
 import model.HttpResponse;
 import model.HttpStatusCode;
 import model.User;
+import org.apache.commons.lang.StringUtils;
 import util.HttpResponseUtils;
 import util.UserUtils;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by 77loo on 2017-03-05.
@@ -16,7 +18,7 @@ import java.util.Collection;
 public class UserListService extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
-        if (!UserUtils.isLogined(request.getCookie("logined"))) {
+        if (UserUtils.isLogout(request.getCookies())) {
             HttpResponseUtils.setRedirect(response, "/user/login.html");
             return;
         }
@@ -25,7 +27,7 @@ public class UserListService extends AbstractController {
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
-        if (!UserUtils.isLogined(request.getCookie("logined"))) {
+        if (UserUtils.isLogout(request.getCookies())) {
             HttpResponseUtils.setRedirect(response, "/user/login.html");
             return;
         }

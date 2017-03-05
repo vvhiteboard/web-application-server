@@ -25,9 +25,8 @@ public class UserLoginService extends AbstractController {
     public void doPost(HttpRequest request, HttpResponse response) {
         Map<String, String> bodyParam = HttpRequestUtils.parseQueryString(request.getBodyContents());
         User user = UserUtils.createUser(bodyParam);
-        User findedUser = DataBase.findUserById(user.getUserId());
 
-        if(StringUtils.equals(findedUser.getUserId(), user.getUserId()) && StringUtils.equals(findedUser.getPassword(), user.getPassword())){
+        if(isValidUser(user)) {
             response.setCookie("logined", "true");
             HttpResponseUtils.setRedirect(response, "/index.html");
         }
@@ -35,5 +34,15 @@ public class UserLoginService extends AbstractController {
             response.setCookie("logined", "false");
             HttpResponseUtils.setRedirect(response, "/user/login_failed.html");
         }
+    }
+
+    private boolean isValidUser(User user) {
+        User findedUser = DataBase.findUserById(user.getUserId());
+
+        if (findedUser == null) {
+            return false;
+        }
+
+        return (StringUtils.equals(findedUser.getUserId(), user.getUserId())) && (StringUtils.equals(findedUser.getPassword(), user.getPassword()));
     }
 }
