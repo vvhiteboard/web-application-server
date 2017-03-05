@@ -5,7 +5,6 @@ package model;
  */
 public enum HttpStatusCode {
     OK(200, "Ok"),
-
     FOUND(302, "Redirect");
 
     private String responseString;

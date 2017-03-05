@@ -1,5 +1,11 @@
 package model;
 
+import util.HttpRequestUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,10 +15,15 @@ import java.util.Map;
 public class HttpRequest {
     private Map<String, String> requestLine;
     private Map<String, String> header;
-    private String body;
+    private String bodyContents;
 
-    private Map<String, String> queryString;
+    private Map<String, String> parameters;
     private Map<String, String> cookies;
+
+    public HttpRequest(InputStream in) throws IOException {
+        BufferedReader requestReader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
+        HttpRequestUtils.parseHttpRequest(this, requestReader);
+    }
 
     public String getMethod() {
         return requestLine.get("method");
@@ -61,12 +72,12 @@ public class HttpRequest {
         return this.header.get(key);
     }
 
-    public String getBody() {
-        return body;
+    public String getBodyContents() {
+        return bodyContents;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setBodyContents(String bodyContents) {
+        this.bodyContents = bodyContents;
     }
 
     public Map<String, String> getRequestLine() {
@@ -77,12 +88,12 @@ public class HttpRequest {
         this.requestLine = requestLine;
     }
 
-    public Map<String, String> getQueryString() {
-        return queryString;
+    public Map<String, String> getParameters() {
+        return parameters;
     }
 
-    public void setQueryString(Map<String, String> queryString) {
-        this.queryString = queryString;
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
     }
 
     public Map<String, String> getCookies() {

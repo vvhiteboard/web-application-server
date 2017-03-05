@@ -1,17 +1,19 @@
 package util;
 
-import java.io.*;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import model.HttpRequest;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webserver.RequestHandler;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import model.HttpRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import webserver.RequestHandler;
 
 public class HttpRequestUtils {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -56,24 +58,25 @@ public class HttpRequestUtils {
         return new Pair(tokens[0], tokens[1]);
     }
 
-    public static HttpRequest parseHttpRequest(BufferedReader requestReader) throws IOException {
-        HttpRequest httpRequest = new HttpRequest();
+    public static HttpRequest parseHttpRequest(HttpRequest httpRequest, BufferedReader requestReader) throws IOException {
 
         httpRequest.setRequestLine(parseRequestLine(requestReader));
-        if (httpRequest.getRequestLine().containsKey("queryString")) {
-            httpRequest.setQueryString(parseQueryString(httpRequest.getRequestLine().get("queryString")));
-        }
-
         httpRequest.setHeader(parseRequestHeader(requestReader));
         httpRequest.setCookies(parseCookies(httpRequest.getHeaderValueByKey("Cookie")));
 
-        if ("POST".equals(httpRequest.getMethod())) {
-            httpRequest.setBody(parseRequestBody(requestReader, httpRequest.getHeaderValueByKey("Content-Length")));
+        if (StringUtils.equals(httpRequest.getMethod(), "GET")) {
+            httpRequest.setParameters(parseQueryString(httpRequest.getRequestLine().get("queryString")));
+        }
+        else if ("POST".equals(httpRequest.getMethod())) {
+            httpRequest.setBodyContents(parseRequestBody(requestReader, httpRequest.getHeaderValueByKey("Content-Length")));
+            httpRequest.setParameters(parseQueryString(httpRequest.getBodyContents()));
         }
 
         return httpRequest;
     }
 
+    // 만약 첫 라인을 동일하게 Header로 설정하면 Header 마라미터로 method나 version이라는 값을
+    // 제대로 파싱하지 못할 수도 있다
     public static Map<String, String> parseRequestLine(BufferedReader requestStream) throws IOException {
         Map<String, String> requestLine = new HashMap<>();
         String[] requestLineValues = requestStream.readLine().split(" ");
@@ -89,19 +92,16 @@ public class HttpRequestUtils {
     }
 
     public static Map<String, String> parseRequestHeader(BufferedReader requestStream) throws IOException {
-        // parse http requestHeader first line ( request line )
         Map<String, String> requestHeader = new HashMap<>();
+        String requestHeaderLine;
 
-        String requestHeaderLine = requestStream.readLine();
-        while (requestHeaderLine != null && !requestHeaderLine.isEmpty()) {
+        while ((requestHeaderLine = requestStream.readLine()) != null && !requestHeaderLine.isEmpty()) {
             Pair keyValue = getKeyValue(requestHeaderLine, ": ");
             if (keyValue == null) {
                 log.debug("invalid Http Header : {}\r\n", requestHeaderLine);
-                requestHeaderLine = requestStream.readLine();
                 continue;
             }
             requestHeader.put(keyValue.getKey(), keyValue.getValue());
-            requestHeaderLine = requestStream.readLine();
         }
 
         return requestHeader;
