@@ -2,6 +2,9 @@ package model;
 
 import com.google.common.collect.Maps;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -16,10 +19,16 @@ public class HttpResponse {
     private Map<String, String> cookies;
 
     private byte[] body;
+    private DataOutputStream stream;
 
     public HttpResponse() {
         headers = Maps.newHashMap();
         cookies = Maps.newHashMap();
+    }
+
+    public HttpResponse(OutputStream out) {
+        this();
+        this.stream = new DataOutputStream(out);
     }
 
     public String getVersion() {
@@ -76,6 +85,15 @@ public class HttpResponse {
 
     public void setBody(byte[] body) {
         this.body = body;
+        this.headers.put("Content-Length", Integer.toString(this.body.length));
+    }
+
+    public void setResponseStream() throws IOException {
+        byte[] body = this.body;
+        this.stream.writeBytes(this.toString());
+        this.stream.writeBytes("\r\n");
+        this.stream.write(body, 0, body.length);
+        this.stream.flush();
     }
 
     private String createHeaderStream() {

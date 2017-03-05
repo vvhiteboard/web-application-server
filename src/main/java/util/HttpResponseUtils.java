@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 /**
  * Created by loopin on 2017-02-20.
@@ -15,18 +17,9 @@ import java.io.IOException;
 public class HttpResponseUtils {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
-    public static HttpResponse createHttpResponse(HttpStatusCode code) {
-        HttpResponse response = new HttpResponse();
-        response.setStatusCode(code);
-        switch (code) {
-            case OK :
-                response.setHeader("Contents-Type", "text/html; charset=utf-8");
-                break;
-            case FOUND:
-                response.setHeader("Location", "http://localhost:8080/index.html");
-                break;
-        }
-        return response;
+    public static void setRedirect(HttpResponse response, String location) {
+        response.setStatusCode(HttpStatusCode.FOUND);
+        response.setHeader("Location", location);
     }
 
     public static void setResponseStream(DataOutputStream responseStream, HttpResponse response) {
@@ -41,8 +34,18 @@ public class HttpResponseUtils {
         }
     }
 
-    public static void setResponseBody(HttpResponse response, byte[] body) {
+    public static void setResource(HttpResponse response, String path) throws IOException {
+        String contentType;
+        if (path.endsWith(".css")) {
+            contentType = "text/css; charset=utf-8";
+        } else {
+            contentType = "text/html; charset=utf-8";
+        }
+
+        byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
+
+        response.setStatusCode(HttpStatusCode.OK);
+        response.setHeader("Content-Type", contentType);
         response.setBody(body);
-        response.setHeader("Content-Length", Integer.toString(body.length));
     }
 }
