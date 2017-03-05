@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static util.ParseUtils.*;
+
 public class HttpRequestUtils {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 
@@ -19,7 +21,7 @@ public class HttpRequestUtils {
      * @return
      */
     public static void parseQueryString(HttpRequest request) {
-        request.setParameters(ParseUtils.parseBySeparator(request.getQueryString(), "&"));
+        request.setParameters(parseBySeparator(request.getQueryString(), "&"));
     }
 
     /**
@@ -28,7 +30,7 @@ public class HttpRequestUtils {
      */
     public static void parseCookies(HttpRequest request) {
         String cookies = request.getHeaderValueByKey("Cookie");
-        request.setCookies(ParseUtils.parseBySeparator(cookies, ";"));
+        request.setCookies(parseBySeparator(cookies, ";"));
     }
 
     public static HttpRequest parseHttpRequest(HttpRequest httpRequest, BufferedReader requestReader) throws IOException {
@@ -67,7 +69,7 @@ public class HttpRequestUtils {
         String requestHeaderLine;
 
         while ((requestHeaderLine = requestStream.readLine()) != null && !requestHeaderLine.isEmpty()) {
-            ParseUtils.Pair keyValue = ParseUtils.getKeyValue(requestHeaderLine, ": ");
+            Pair keyValue = getKeyValue(requestHeaderLine, ": ");
             if (keyValue == null) {
                 log.debug("invalid Http Header : {}\r\n", requestHeaderLine);
                 continue;
