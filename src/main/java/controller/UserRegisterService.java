@@ -16,14 +16,14 @@ public class UserRegisterService extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
         register(request.getParameters());
-        HttpResponseUtils.setRedirect(response, "/index.html");
+        response.setRedirect("/index.html");
     }
 
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
         Map<String, String> userParametars = UserUtils.parseLoginParams(request.getBody());
         register(userParametars);
-        HttpResponseUtils.setRedirect(response, "/index.html");
+        response.setRedirect("/index.html");
     }
 
     private void register(Map<String, String> parameters) {

@@ -19,7 +19,7 @@ public class UserListService extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
         if (UserUtils.isLogout(request.getCookies())) {
-            HttpResponseUtils.setRedirect(response, "/user/login.html");
+            response.setRedirect("/user/login.html");
             return;
         }
         userListing(response);
@@ -28,7 +28,7 @@ public class UserListService extends AbstractController {
     @Override
     public void doPost(HttpRequest request, HttpResponse response) {
         if (UserUtils.isLogout(request.getCookies())) {
-            HttpResponseUtils.setRedirect(response, "/user/login.html");
+            response.setRedirect("/user/login.html");
             return;
         }
         userListing(response);

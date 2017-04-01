@@ -8,7 +8,6 @@ import model.HttpRequest;
 import model.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.HttpResponseUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,7 +49,7 @@ public class RequestHandler extends Thread {
                 controller.service(httpRequest, httpResponse);
             } else {
                 String path = httpRequest.getPath();
-                HttpResponseUtils.setResource(httpResponse, path);
+                httpResponse.setResource(path);
             }
             httpResponse.setResponseStream();
 

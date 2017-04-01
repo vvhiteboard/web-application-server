@@ -3,8 +3,10 @@ package model;
 import com.google.common.collect.Maps;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -86,6 +88,25 @@ public class HttpResponse {
     public void setBody(byte[] body) {
         this.body = body;
         this.headers.put("Content-Length", Integer.toString(this.body.length));
+    }
+
+    public void setResource(String path) throws IOException {
+        String contentType;
+        if (path.endsWith(".css")) {
+            contentType = "text/css; charset=utf-8";
+        } else {
+            contentType = "text/html; charset=utf-8";
+        }
+
+        byte[] body = Files.readAllBytes(new File("./webapp" + path).toPath());
+        this.statusCode = HttpStatusCode.OK;
+        this.headers.put("Content-Type", contentType);
+        this.setBody(body);
+    }
+
+    public void setRedirect(String location) {
+        this.statusCode = HttpStatusCode.FOUND;
+        this.headers.put("Location", location);
     }
 
     public void setResponseStream() throws IOException {

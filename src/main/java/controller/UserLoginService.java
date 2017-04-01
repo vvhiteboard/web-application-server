@@ -17,7 +17,7 @@ public class UserLoginService extends AbstractController {
     @Override
     public void doGet(HttpRequest request, HttpResponse response) {
         response.setCookie("logined", "false");
-        HttpResponseUtils.setRedirect(response, "/user/login_failed.html");
+        response.setRedirect("/user/login_failed.html");
     }
 
     @Override
@@ -27,11 +27,11 @@ public class UserLoginService extends AbstractController {
 
         if(isValidUser(user)) {
             response.setCookie("logined", "true");
-            HttpResponseUtils.setRedirect(response, "/index.html");
+            response.setRedirect("/index.html");
         }
         else {
             response.setCookie("logined", "false");
-            HttpResponseUtils.setRedirect(response, "/user/login_failed.html");
+            response.setRedirect("/user/login_failed.html");
         }
     }
 

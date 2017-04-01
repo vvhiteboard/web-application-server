@@ -1,6 +1,8 @@
 package model;
 
+import org.apache.commons.lang.StringUtils;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,7 +28,26 @@ public class HttpRequest {
 
     public HttpRequest(InputStream in) throws IOException {
         BufferedReader requestReader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
-        HttpRequestUtils.parseHttpRequest(this, requestReader);
+
+        String[] requestLineValues = requestReader.readLine().split(" ");
+        this.method = requestLineValues[0];
+        this.version = requestLineValues[2];
+
+        String[] requestUrl = requestLineValues[1].split("\\?");
+        this.path = requestUrl[0];
+        if (requestUrl.length > 1) {
+            this.queryString = requestUrl[1];
+        }
+
+        header = HttpRequestUtils.parseRequestHeader(requestReader);
+        cookies = HttpRequestUtils.parseCookies(header.get("Cookie"));
+
+        if (StringUtils.equals(this.method, "GET")) {
+            parameters = HttpRequestUtils.parseQueryString(queryString);
+        }
+        else if (StringUtils.equals(this.method, "POST")) {
+            body = IOUtils.readData(requestReader, Integer.parseInt(header.get("Content-Length")));
+        }
     }
 
     public String getMethod() {
@@ -53,10 +74,6 @@ public class HttpRequest {
         this.path = path;
     }
 
-    public String getQueryString() {
-        return queryString;
-    }
-
     public void setQueryString(String queryString) {
         this.queryString = queryString;
     }
@@ -69,15 +86,7 @@ public class HttpRequest {
         this.header = header;
     }
 
-    public void setHeaderKeyValue(String key, String value) {
-        if (this.header == null) {
-            this.header = new HashMap<>();
-        }
-        this.header.put(key, value);
-
-    }
-
-    public String getHeaderValueByKey(String key) {
+    public String getHeaderValue(String key) {
         if (this.header == null) {
             return null;
         }
@@ -104,7 +113,7 @@ public class HttpRequest {
         return cookies;
     }
 
-    public String getCookie(String key) {
+    public String getCookieValue(String key) {
         return cookies.get(key);
     }
 
