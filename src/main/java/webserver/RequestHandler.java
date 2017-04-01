@@ -37,11 +37,6 @@ public class RequestHandler extends Thread {
             HttpRequest httpRequest = new HttpRequest(in);
             HttpResponse httpResponse = new HttpResponse(out);
 
-            log.debug("Method : {}, Path : {}, Version : {}", httpRequest.getMethod(),
-                    httpRequest.getPath(), httpRequest.getVersion());
-
-            Map<String, String> headers = httpRequest.getHeader();
-            headers.keySet().forEach(key -> log.debug("key : {}, value : {}", key, headers.get(key)));
 
 
             Controller controller = controllerMap.get(httpRequest.getPath());

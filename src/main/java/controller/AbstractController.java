@@ -18,7 +18,7 @@ public abstract class AbstractController implements Controller {
             doPost(httpRequest, httpResponse);
         }
         else {
-            HttpResponseUtils.setRedirect(httpResponse, "/index.html");
+            httpResponse.setRedirect("/index.html");
         }
     }
     public abstract void doGet(HttpRequest request, HttpResponse response);
