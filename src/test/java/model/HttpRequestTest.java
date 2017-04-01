@@ -34,6 +34,6 @@ public class HttpRequestTest {
 
     @Test
     public void test() {
-        Map<String, String> map = new HashMap<>();
+
     }
 }

@@ -120,4 +120,12 @@ public class HttpRequest {
     public void setCookies(Map<String, String> cookies) {
         this.cookies = cookies;
     }
+
+    public String getSessionId() {
+        return this.cookies.get("JSESSIONID");
+    }
+
+    public void setSeesionId(String sessionId) {
+        this.cookies.put("JSESSIONID", sessionId);
+    }
 }

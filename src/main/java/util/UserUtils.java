@@ -1,5 +1,6 @@
 package util;
 
+import model.HttpSession;
 import model.User;
 import org.apache.commons.lang.StringUtils;
 
@@ -14,8 +15,9 @@ public class UserUtils {
         return user;
     }
 
-    public static boolean isLogout(Map<String, String> cookies) {
-        return (cookies.get("logined") == null) || (StringUtils.equals(cookies.get("logined"), "false"));
+    public static boolean isLogout(String sessionId) {
+        HttpSession session = SessionUtils.getSession(sessionId);
+        return session == null || session.getAttribute("user") == null;
     }
 
     public static Map<String, String> parseLoginParams(String body) {

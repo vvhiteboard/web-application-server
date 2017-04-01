@@ -109,6 +109,10 @@ public class HttpResponse {
         this.headers.put("Location", location);
     }
 
+    public void setSessionId(String sessionId) {
+        this.cookies.put("JSESSIONID", sessionId);
+    }
+
     public void setResponseStream() throws IOException {
         byte[] body = this.body;
         this.stream.writeBytes(this.toString());

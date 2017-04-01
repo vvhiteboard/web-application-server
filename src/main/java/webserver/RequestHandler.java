@@ -4,10 +4,13 @@ import controller.Controller;
 import controller.UserListService;
 import controller.UserLoginService;
 import controller.UserRegisterService;
+import db.HttpSessions;
 import model.HttpRequest;
 import model.HttpResponse;
+import model.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.SessionUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,7 +40,13 @@ public class RequestHandler extends Thread {
             HttpRequest httpRequest = new HttpRequest(in);
             HttpResponse httpResponse = new HttpResponse(out);
 
+            String sessionId = httpRequest.getSessionId();
 
+            if(sessionId == null || !SessionUtils.isExistSessionId(sessionId)) {
+                HttpSession newSession = SessionUtils.createNewSession();
+                httpRequest.setSeesionId(newSession.getId());
+
+            }
 
             Controller controller = controllerMap.get(httpRequest.getPath());
             if (controller != null) {
@@ -46,6 +55,7 @@ public class RequestHandler extends Thread {
                 String path = httpRequest.getPath();
                 httpResponse.setResource(path);
             }
+            httpResponse.setSessionId(httpRequest.getSessionId());
             httpResponse.setResponseStream();
 
         } catch (Exception e) {

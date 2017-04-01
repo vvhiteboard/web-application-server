@@ -14,12 +14,6 @@ import java.util.Map;
  */
 public class UserRegisterService extends AbstractController {
     @Override
-    public void doGet(HttpRequest request, HttpResponse response) {
-        register(request.getParameters());
-        response.setRedirect("/index.html");
-    }
-
-    @Override
     public void doPost(HttpRequest request, HttpResponse response) {
         Map<String, String> userParametars = UserUtils.parseLoginParams(request.getBody());
         register(userParametars);
